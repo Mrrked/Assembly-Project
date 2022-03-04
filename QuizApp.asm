@@ -11,7 +11,11 @@
 ;       Cube, Jeremy
 ;       Jizmundo, Piolo Brian
 ;       Tacata, Jericho Vince
+;   
+;   Run the application by executing the following command in the WSL command line
+;   nasm -f elf64 QuizApp.asm && ld -s -o QuizApp QuizApp.o && ./QuizApp
 
+;CONSTANTS For System Calls of the Registers
 SYS_EXIT  equ 1
 
 SYS_WRITE equ 4
@@ -29,11 +33,11 @@ STDIN     equ 2
 %endmacro
 
 %macro eatbuffer 0
-    ;READ and STORE USER INPUT TO NUM VARIABLE
+    ;READ and STORE USER INPUT TO ANS VARIABLE
     mov eax, SYS_READ
     mov ebx, STDIN
     mov ecx, ans  
-    mov edx, 1                  ;2 bytes (numeric, 1 for sign) of that information
+    mov edx, 1                  
     int 0x80
 %endmacro
 
@@ -70,11 +74,11 @@ STDIN     equ 2
     mov	edx, %6                 ;message length
     int	0x80                    ;call kernel
 
-    ;READ and STORE USER INPUT TO NUM VARIABLE
+    ;READ and STORE USER INPUT TO ANS VARIABLE
     mov eax, SYS_READ
     mov ebx, STDIN
     mov ecx, ans  
-    mov edx, 1                  ;2 bytes (numeric, 1 for sign) of that information
+    mov edx, 1                  
     int 0x80
     
 %endmacro
@@ -85,7 +89,7 @@ STDIN     equ 2
     mov [%1], edx    
 %endmacro
 
-section .data               ;Constants
+section .data               ;Variables
     ans1 DB 'a', 0xa, 0xa
     ans2 DB 'b', 0xa, 0xa
     ans3 DB 'c', 0xa, 0xa
@@ -98,15 +102,10 @@ section .data               ;Constants
     ans10 DB 'a', 0xa, 0xa
 
     score DB '0'
-    lenScore equ $ - score
-    
-    incr DB '1'
+    lenScore equ $ - score    
 
     HEADER1 DB 'Arithmetic Quiz App', 0xa, 0xa
     lenH1 equ $ - HEADER1
-    
-    ;HEADER2 DB 'Press Enter to start the quiz : ', 0xa
-    ;lenH2 equ $ - HEADER2
 
     BODY1 DB 'Select the letter of the correct answer : ', 0xa, 0xa
     lenB1 equ $ - BODY1
@@ -193,7 +192,7 @@ section .data               ;Constants
     lenQA10 equ $ - QA10
 
 
-section .bss                ;Variables
+section .bss                ;Uninitialized Variables
     ans resb 1
 
 section	.text
@@ -208,16 +207,15 @@ section	.text
     write_QA Q1, lenQ1, QA1, lenQA1, BODY2, lenB2
     compare ans, 'a', True1, False1
     
-    ; if (true) {your answer is correct;score++; go to Q2} else {Q2, the corrent answer is} 
-    
     True1:
         incBy1 score
         write_MSG ans1, 1
         write_MSG BODYT, lenBT
         JMP _Qs2
+        
     False1:
         write_MSG BODYF, lenBF
-        write_MSG ans1, 2
+        write_MSG ans1, 3
         JMP _Qs2
 
     _Qs2:
@@ -367,18 +365,13 @@ section	.text
     _exit:
 
         write_MSG FOOTER1, lenF1
-
         write_MSG score, lenScore
-
         write_MSG FOOTER2, lenF2
-
         write_MSG FOOTER3, lenF3
-
         write_MSG FOOTER4, lenF4
-
 
         ;EXIT    
         mov	eax, SYS_EXIT           ;system call number (sys_exit)
         int	0x80                    ;call kernel
 
-;   nasm -f elf64 QuizApp.asm && ld -s -o QuizApp QuizApp.o && ./QuizApp
+
