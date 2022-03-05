@@ -1,7 +1,7 @@
 ;   SUBJECT: Computer Organization and Assembly Language
 ;   COURSE AND SECTION: BSCS 3-3
 ;    
-;   PROJECT: Quiz App 
+;   PROJECT: Simple Arithmetic Quiz App 
 ;   
 ;   Five (5) Members
 ;   Leader:
@@ -25,22 +25,6 @@ SYS_READ  equ 3
 STDIN     equ 2
 
 ;MACROS
-%macro compare 4
-    mov ecx, [%1]
-    cmp ecx, %2
-    JE  %3
-    JNE %4
-%endmacro
-
-%macro eatbuffer 0
-    ;READ and STORE USER INPUT TO ANS VARIABLE
-    mov eax, SYS_READ
-    mov ebx, STDIN
-    mov ecx, ans  
-    mov edx, 1                  
-    int 0x80
-%endmacro
-
 %macro write_MSG 2              
     ;WRITE MESSAGE              
     mov	eax, SYS_WRITE          ;system call number (sys_write)    
@@ -81,6 +65,22 @@ STDIN     equ 2
     mov edx, 1                  
     int 0x80
     
+%endmacro
+
+%macro compare 4
+    mov ecx, [%1]
+    cmp ecx, %2
+    JE  %3
+    JNE %4
+%endmacro
+
+%macro eatbuffer 0
+    ;READ and STORE USER INPUT TO ANS VARIABLE
+    mov eax, SYS_READ
+    mov ebx, STDIN
+    mov ecx, ans  
+    mov edx, 1                  
+    int 0x80
 %endmacro
 
 %macro incBy1 1
@@ -195,7 +195,7 @@ section .data               ;Variables
 section .bss                ;Uninitialized Variables
     ans resb 1
 
-section	.text
+section	.text               ;Program Logic
     global _start           ;must be declared for using gcc
 
     _start:                 ;tell linker entry point
